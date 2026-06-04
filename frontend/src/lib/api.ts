@@ -1,6 +1,6 @@
 // API Client for AquanovaX Backend
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://aquanovax2.onrender.com/api';
 
 // Helper to get auth token from local storage
 const getAuthToken = () => localStorage.getItem('aquanovax_token');
