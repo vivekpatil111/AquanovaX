@@ -1,0 +1,134 @@
+// Main App Router — AquanovaX
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
+import { AppShell } from '@/components/layout/AppShell';
+import { LoginPage } from '@/pages/auth/LoginPage';
+import { SignupPage } from '@/pages/auth/SignupPage';
+import { ForgotPasswordPage, OTPPage } from '@/pages/auth/ForgotPasswordPage';
+import { ThemeProvider } from '@mui/material/styles';
+import { muiTheme } from '@/theme/muiTheme';
+
+// Customer pages
+import { CustomerDashboard } from '@/pages/customer/CustomerDashboard';
+import { MarketplacePage } from '@/pages/customer/MarketplacePage';
+import { SupplierProfilePage } from '@/pages/customer/SupplierProfilePage';
+import { BookingPage } from '@/pages/customer/BookingPage';
+import { OrdersPage, TrackingPage, PaymentsPage, WalletPage, ReviewsPage } from '@/pages/customer/CustomerPages';
+
+// Supplier pages
+import {
+  SupplierDashboard, SupplierOrdersPage, TankerManagementPage,
+  WaterQualityPage, SupplierAnalyticsPage, SupplierProfileManagementPage,
+} from '@/pages/supplier/SupplierPages';
+
+// Driver pages
+import {
+  DriverDashboard, DeliveryManagementPage, RoutePage, DriverPerformancePage,
+} from '@/pages/driver/DriverPages';
+
+// Admin pages
+import {
+  AdminDashboard, UserManagementPage, SupplierManagementPage,
+  DriverManagementPage, OrderMonitoringPage, ComplaintManagementPage,
+  SystemAnalyticsPage, AquaMatchDashboard,
+} from '@/pages/admin/AdminPages';
+
+import type { Role } from '@/types';
+
+function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: Role[] }) {
+  const { isAuthenticated, user } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    const redirect = { customer: '/customer', supplier: '/supplier', driver: '/driver', admin: '/admin' };
+    return <Navigate to={redirect[user.role]} replace />;
+  }
+  return <>{children}</>;
+}
+
+export function App() {
+  const { isAuthenticated, user } = useAuthStore();
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login"           element={<LoginPage />} />
+        <Route path="/signup"          element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/otp"             element={<OTPPage />} />
+
+        {/* Root redirect */}
+        <Route path="/" element={
+          isAuthenticated
+            ? <Navigate to={`/${user?.role ?? 'customer'}`} replace />
+            : <Navigate to="/login" replace />
+        } />
+
+        {/* ── CUSTOMER PORTAL ── */}
+        <Route path="/customer/*" element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <ThemeProvider theme={muiTheme}>
+              <AppShell title="Customer Portal" />
+            </ThemeProvider>
+          </ProtectedRoute>
+        }>
+          <Route index                    element={<CustomerDashboard />} />
+          <Route path="marketplace"        element={<MarketplacePage />} />
+          <Route path="supplier/:id"       element={<SupplierProfilePage />} />
+          <Route path="book"              element={<BookingPage />} />
+          <Route path="orders"            element={<OrdersPage />} />
+          <Route path="track"             element={<TrackingPage />} />
+          <Route path="payments"          element={<PaymentsPage />} />
+          <Route path="wallet"            element={<WalletPage />} />
+          <Route path="reviews"           element={<ReviewsPage />} />
+        </Route>
+
+        {/* ── SUPPLIER PORTAL ── */}
+        <Route path="/supplier" element={
+          <ProtectedRoute allowedRoles={['supplier']}>
+            <AppShell title="Supplier Portal" />
+          </ProtectedRoute>
+        }>
+          <Route index               element={<SupplierDashboard />} />
+          <Route path="orders"       element={<SupplierOrdersPage />} />
+          <Route path="tankers"      element={<TankerManagementPage />} />
+          <Route path="quality"      element={<WaterQualityPage />} />
+          <Route path="analytics"    element={<SupplierAnalyticsPage />} />
+          <Route path="profile"      element={<SupplierProfileManagementPage />} />
+        </Route>
+
+        {/* ── DRIVER PORTAL ── */}
+        <Route path="/driver" element={
+          <ProtectedRoute allowedRoles={['driver']}>
+            <AppShell title="Driver Portal" />
+          </ProtectedRoute>
+        }>
+          <Route index               element={<DriverDashboard />} />
+          <Route path="deliveries"   element={<DeliveryManagementPage />} />
+          <Route path="route"        element={<RoutePage />} />
+          <Route path="performance"  element={<DriverPerformancePage />} />
+        </Route>
+
+        {/* ── ADMIN PORTAL ── */}
+        <Route path="/admin" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AppShell title="Admin Portal" />
+          </ProtectedRoute>
+        }>
+          <Route index               element={<AdminDashboard />} />
+          <Route path="users"        element={<UserManagementPage />} />
+          <Route path="suppliers"    element={<SupplierManagementPage />} />
+          <Route path="drivers"      element={<DriverManagementPage />} />
+          <Route path="orders"       element={<OrderMonitoringPage />} />
+          <Route path="complaints"   element={<ComplaintManagementPage />} />
+          <Route path="analytics"    element={<SystemAnalyticsPage />} />
+          <Route path="aquamatch"    element={<AquaMatchDashboard />} />
+          <Route path="quality"      element={<AquaMatchDashboard />} />
+        </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
