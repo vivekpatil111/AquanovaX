@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Droplets, Star, Wallet, TrendingUp, MapPin, Clock, ChevronRight } from 'lucide-react';

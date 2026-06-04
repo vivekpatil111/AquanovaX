@@ -102,7 +102,7 @@ export function SupplierProfilePage() {
             <TrustBadgeComp badge={supplier.badge} />
             <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div className="bg-slate-50 rounded-lg p-2">
-                <div className="font-bold text-dark">{formatNumber(1250)}</div>
+                <div className="font-bold text-dark">{Number(1250).toLocaleString()}</div>
                 <div className="text-muted text-xs">Total Orders</div>
               </div>
               <div className="bg-slate-50 rounded-lg p-2">
