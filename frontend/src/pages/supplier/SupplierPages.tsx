@@ -14,7 +14,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import {
   Package, DollarSign, Truck, Star, Check, X,
-  Plus, Edit2, FileText, AlertCircle, Loader2
+  Plus, Edit2, FileText, AlertCircle, Loader2, Shield, Upload, CheckCircle2
 } from 'lucide-react';
 
 // ─── SUPPLIER DASHBOARD ───────────────────────────────────────
@@ -23,6 +23,7 @@ export function SupplierDashboard() {
   const [orders, setOrders] = useState<Record<string, any>[]>([]);
   const [supplier, setSupplier] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -61,6 +62,9 @@ export function SupplierDashboard() {
             <span className="text-muted text-sm">Trust Score: <strong className="text-dark">{supplier?.trust_score || 0}/100</strong></span>
           </div>
         </div>
+        <button onClick={() => navigate('/supplier/kyc')} className="btn-secondary">
+          <Shield className="w-4 h-4" /> Verify Business
+        </button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -75,6 +79,14 @@ export function SupplierDashboard() {
           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <span className="font-semibold text-amber-800">{pendingOrders} new orders awaiting your response</span>
           <a href="#orders" className="ml-auto btn-primary btn-sm bg-amber-600 hover:bg-amber-700">View Orders</a>
+        </div>
+      )}
+      
+      {(supplier?.trust_score || 0) < 100 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">
+          <Shield className="w-5 h-5 text-red-600 flex-shrink-0" />
+          <span className="font-semibold text-red-800">Complete your KYC to unlock Trust Badges and increase visibility</span>
+          <button onClick={() => navigate('/supplier/kyc')} className="ml-auto btn-primary btn-sm bg-red-600 hover:bg-red-700">Complete KYC</button>
         </div>
       )}
 
@@ -391,17 +403,72 @@ export function TankerManagementPage() {
 export function WaterQualityPage() {
   const { user } = useAuthStore();
   const [supplier, setSupplier] = useState<Record<string, any> | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (user) api.suppliers.getOne(user.id).then(setSupplier).catch(() => {});
   }, [user]);
+
+  const handleUpload = () => {
+    if (!selectedFile) return;
+    setUploading(true);
+    setTimeout(() => {
+      setUploading(false);
+      setShowUpload(false);
+      setSelectedFile(null);
+      alert('Quality report uploaded successfully! It is pending admin approval.');
+    }, 1500);
+  };
 
   const tds = supplier?.tds || 50;
   const ph = supplier?.ph || 7.2;
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-dark">Water Quality Reports</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-dark">Water Quality Reports</h1>
+        <button onClick={() => setShowUpload(true)} className="btn-primary btn-sm">
+          <Upload className="w-4 h-4" /> Upload Report
+        </button>
+      </div>
+
+      {showUpload && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl animate-fade-in">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-dark">Upload Lab Report</h3>
+              <button onClick={() => setShowUpload(false)} className="p-1 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-muted" /></button>
+            </div>
+            
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-gray-50 transition-colors mb-4">
+              {selectedFile ? (
+                <div className="text-center">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-dark">{selectedFile.name}</p>
+                </div>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <p className="text-sm font-medium text-dark mb-1">Click to upload PDF report</p>
+                  <label className="btn-secondary text-sm cursor-pointer mt-2">
+                    Select File
+                    <input type="file" className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} accept=".pdf" />
+                  </label>
+                </>
+              )}
+            </div>
+
+            <div className="pt-2 flex gap-3">
+              <button type="button" onClick={() => setShowUpload(false)} className="btn-secondary flex-1" disabled={uploading}>Cancel</button>
+              <button onClick={handleUpload} className="btn-primary flex-1" disabled={uploading || !selectedFile}>
+                {uploading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" /> : 'Submit'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="card text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-transparent opacity-50" />

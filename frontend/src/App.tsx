@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { AppShell } from '@/components/layout/AppShell';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupPage } from '@/pages/auth/SignupPage';
-import { ForgotPasswordPage, OTPPage } from '@/pages/auth/ForgotPasswordPage';
+import { ForgotPasswordPage, OTPPage, ResetPasswordPage } from '@/pages/auth/ForgotPasswordPage';
 import { ThemeProvider } from '@mui/material/styles';
 import { muiTheme } from '@/theme/muiTheme';
 
@@ -21,6 +21,8 @@ import {
   WaterQualityPage, SupplierAnalyticsPage, SupplierProfileManagementPage,
 } from '@/pages/supplier/SupplierPages';
 
+import { KYCOnboarding } from '@/pages/supplier/KYCOnboarding';
+
 // Driver pages
 import {
   DriverDashboard, DeliveryManagementPage, RoutePage, DriverPerformancePage,
@@ -32,6 +34,8 @@ import {
   DriverManagementPage, OrderMonitoringPage, ComplaintManagementPage,
   SystemAnalyticsPage, AquaMatchDashboard,
 } from '@/pages/admin/AdminPages';
+import { DispatchDashboard } from '@/pages/admin/DispatchDashboard';
+import { FleetAnalytics } from '@/pages/admin/FleetAnalytics';
 
 import type { Role } from '@/types';
 
@@ -56,6 +60,7 @@ export function App() {
         <Route path="/signup"          element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/otp"             element={<OTPPage />} />
+        <Route path="/reset-password"  element={<ResetPasswordPage />} />
 
         {/* Root redirect */}
         <Route path="/" element={
@@ -90,6 +95,7 @@ export function App() {
           </ProtectedRoute>
         }>
           <Route index               element={<SupplierDashboard />} />
+          <Route path="kyc"          element={<KYCOnboarding />} />
           <Route path="orders"       element={<SupplierOrdersPage />} />
           <Route path="tankers"      element={<TankerManagementPage />} />
           <Route path="quality"      element={<WaterQualityPage />} />
@@ -115,15 +121,16 @@ export function App() {
             <AppShell title="Admin Portal" />
           </ProtectedRoute>
         }>
-          <Route index               element={<AdminDashboard />} />
-          <Route path="users"        element={<UserManagementPage />} />
-          <Route path="suppliers"    element={<SupplierManagementPage />} />
-          <Route path="drivers"      element={<DriverManagementPage />} />
-          <Route path="orders"       element={<OrderMonitoringPage />} />
-          <Route path="complaints"   element={<ComplaintManagementPage />} />
-          <Route path="analytics"    element={<SystemAnalyticsPage />} />
-          <Route path="aquamatch"    element={<AquaMatchDashboard />} />
-          <Route path="quality"      element={<AquaMatchDashboard />} />
+          <Route index                element={<AdminDashboard />} />
+          <Route path="users"         element={<UserManagementPage />} />
+          <Route path="suppliers"     element={<SupplierManagementPage />} />
+          <Route path="drivers"       element={<DriverManagementPage />} />
+          <Route path="fleet"         element={<FleetAnalytics />} />
+          <Route path="dispatch"      element={<DispatchDashboard />} />
+          <Route path="monitoring"    element={<OrderMonitoringPage />} />
+          <Route path="complaints"    element={<ComplaintManagementPage />} />
+          <Route path="analytics"     element={<SystemAnalyticsPage />} />
+          <Route path="aquamatch"     element={<AquaMatchDashboard />} />
         </Route>
 
         {/* Fallback */}

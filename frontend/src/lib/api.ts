@@ -37,6 +37,9 @@ export const api = {
     login: (data: any) => fetchWithAuth('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
     register: (data: any) => fetchWithAuth('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
     logout: () => fetchWithAuth('/auth/logout', { method: 'POST' }),
+    forgotPassword: (data: { email: string }) => fetchWithAuth('/auth/forgot-password', { method: 'POST', body: JSON.stringify(data) }),
+    verifyOTP: (data: { email: string; otp_code: string }) => fetchWithAuth('/auth/verify-otp', { method: 'POST', body: JSON.stringify(data) }),
+    resetPassword: (data: { email: string; otp_code: string; new_password: string }) => fetchWithAuth('/auth/reset-password', { method: 'POST', body: JSON.stringify(data) }),
   },
   listings: {
     getAll: () => fetchWithAuth('/listings/'),

@@ -18,7 +18,7 @@ import { formatCurrency, formatDate, formatDateTime, timeAgo, cn } from '@/lib/u
 import { StatusBadge, TrustBadgeComp } from '@/components/common/Badge';
 import { RatingDisplay } from '@/components/common/StarRating';
 import { Avatar } from '@/components/common/Avatar';
-import { MockMap } from '@/components/maps/MockMap';
+import { LiveMap } from '@/components/maps/LiveMap';
 
 // ─── ORDERS PAGE ──────────────────────────────────────────────
 export function OrdersPage() {
@@ -142,10 +142,8 @@ export function TrackingPage() {
   const [currentStep] = useState(3);
   const events = getMockTrackingEvents(ACTIVE_ORDER.id);
 
-  const mapPoints = [
-    { id: 'driver', lat: 19.082, lng: 72.882, type: 'driver' as const, label: 'Driver', isAnimated: true },
-    { id: 'home',   lat: 19.090, lng: 72.890, type: 'customer' as const, label: 'You' },
-  ];
+  const startPoint = { lat: 19.07, lng: 72.87 }; // Depot/Supplier
+  const endPoint = { lat: 19.10, lng: 72.90 }; // Customer
 
   return (
     <Box sx={{ maxWidth: '800px', mx: 'auto', display: 'flex', flexDirection: 'column', gap: 3 }} className="animate-fade-in">
@@ -158,7 +156,9 @@ export function TrackingPage() {
 
       {/* Live Map */}
       <Card sx={{ overflow: 'hidden' }}>
-        <MockMap points={mapPoints} routePoints={MOCK_ROUTE_POINTS} height="300px" />
+        <Box sx={{ p: 1 }}>
+          <LiveMap routePoints={MOCK_ROUTE_POINTS.length > 0 ? MOCK_ROUTE_POINTS : [startPoint, endPoint]} startPoint={startPoint} endPoint={endPoint} height="350px" />
+        </Box>
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'primary.50', borderTop: '1px solid #E2E8F0' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <MuiAvatar sx={{ bgcolor: 'primary.100', color: 'primary.main', borderRadius: 2 }}>
