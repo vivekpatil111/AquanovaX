@@ -10,6 +10,8 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { TrustBadgeComp, StatusBadge } from '@/components/common/Badge';
 import { RatingDisplay } from '@/components/common/StarRating';
 import { Avatar } from '@/components/common/Avatar';
+import { LiveMap } from '@/components/maps/LiveMap';
+import { MOCK_ROUTE_POINTS } from '@/data/mockData';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -122,21 +124,40 @@ export function CustomerDashboard() {
       </Grid>
 
       <Grid container spacing={3}>
-        {/* Nearby Suppliers Map */}
+        {/* Live Tracking or Nearby Suppliers Map */}
         <Grid size={{xs: 12, lg: 8}}   >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 2, borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box>
-                <Typography variant="h6" fontWeight="bold">Nearby Suppliers</Typography>
-                <Typography variant="body2" color="text.secondary">8 suppliers found within 15 km</Typography>
-              </Box>
-              <Button variant="outlined" size="small" onClick={() => navigate('/customer/marketplace')}>
-                View All
-              </Button>
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <MockMap points={MAP_POINTS} height="300px" />
-            </Box>
+            {activeOrders.length > 0 ? (
+              <>
+                <Box sx={{ p: 2, borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="h6" fontWeight="bold">Active Delivery Tracking</Typography>
+                    <Typography variant="body2" color="text.secondary">Your order is on the way</Typography>
+                  </Box>
+                  <Button variant="outlined" size="small" onClick={() => navigate('/customer/track')}>
+                    Full Details
+                  </Button>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <LiveMap routePoints={MOCK_ROUTE_POINTS} startPoint={{ lat: 19.07, lng: 72.87 }} endPoint={{ lat: 19.10, lng: 72.90 }} height="300px" />
+                </Box>
+              </>
+            ) : (
+              <>
+                <Box sx={{ p: 2, borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="h6" fontWeight="bold">Nearby Suppliers</Typography>
+                    <Typography variant="body2" color="text.secondary">{MAP_POINTS.length} suppliers found nearby</Typography>
+                  </Box>
+                  <Button variant="outlined" size="small" onClick={() => navigate('/customer/marketplace')}>
+                    View All
+                  </Button>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <MockMap points={MAP_POINTS} height="300px" />
+                </Box>
+              </>
+            )}
           </Card>
         </Grid>
 
