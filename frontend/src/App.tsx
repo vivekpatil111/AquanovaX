@@ -14,6 +14,7 @@ import { MarketplacePage } from '@/pages/customer/MarketplacePage';
 import { SupplierProfilePage } from '@/pages/customer/SupplierProfilePage';
 import { BookingPage } from '@/pages/customer/BookingPage';
 import { OrdersPage, TrackingPage, PaymentsPage, WalletPage, ReviewsPage } from '@/pages/customer/CustomerPages';
+import { CustomerWaterQualityPage } from '@/pages/customer/CustomerWaterQualityPage';
 
 // Supplier pages
 import {
@@ -32,7 +33,7 @@ import {
 import {
   AdminDashboard, UserManagementPage, SupplierManagementPage,
   DriverManagementPage, OrderMonitoringPage, ComplaintManagementPage,
-  SystemAnalyticsPage, AquaMatchDashboard,
+  SystemAnalyticsPage, AquaMatchDashboard, AdminQualityPage
 } from '@/pages/admin/AdminPages';
 import { DispatchDashboard } from '@/pages/admin/DispatchDashboard';
 import { FleetAnalytics } from '@/pages/admin/FleetAnalytics';
@@ -86,6 +87,7 @@ export function App() {
           <Route path="payments"          element={<PaymentsPage />} />
           <Route path="wallet"            element={<WalletPage />} />
           <Route path="reviews"           element={<ReviewsPage />} />
+          <Route path="quality"           element={<CustomerWaterQualityPage />} />
         </Route>
 
         {/* ── SUPPLIER PORTAL ── */}
@@ -122,15 +124,13 @@ export function App() {
           </ProtectedRoute>
         }>
           <Route index                element={<AdminDashboard />} />
-          <Route path="users"         element={<UserManagementPage />} />
-          <Route path="suppliers"     element={<SupplierManagementPage />} />
-          <Route path="drivers"       element={<DriverManagementPage />} />
-          <Route path="fleet"         element={<FleetAnalytics />} />
           <Route path="dispatch"      element={<DispatchDashboard />} />
-          <Route path="monitoring"    element={<OrderMonitoringPage />} />
-          <Route path="complaints"    element={<ComplaintManagementPage />} />
-          <Route path="analytics"     element={<SystemAnalyticsPage />} />
+          <Route path="network"       element={<SupplierManagementPage />} />
+          <Route path="quality"       element={<AdminQualityPage />} />
           <Route path="aquamatch"     element={<AquaMatchDashboard />} />
+          <Route path="orders"        element={<OrderMonitoringPage />} />
+          <Route path="analytics"     element={<SystemAnalyticsPage />} />
+          <Route path="users"         element={<UserManagementPage />} />
         </Route>
 
         {/* Fallback */}

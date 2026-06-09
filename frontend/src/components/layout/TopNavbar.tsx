@@ -15,7 +15,8 @@ export function TopNavbar({ title }: { title?: string }) {
   const navigate = useNavigate();
 
   return (
-    <header className="h-16 bg-white border-b border-border flex items-center px-4 gap-3 sticky top-0 z-10">
+    <header className="h-20 lg:h-24 px-4 sm:px-6 lg:px-8 flex items-center gap-4 sticky top-0 z-40 mb-6 transition-all duration-300">
+      <div className="flex-1 w-full h-16 glass rounded-2xl px-4 flex items-center gap-3">
       {/* Hamburger */}
       <button
         onClick={toggleSidebar}
@@ -121,6 +122,7 @@ export function TopNavbar({ title }: { title?: string }) {
       {(showNotifs || showProfile) && (
         <div className="fixed inset-0 z-40" onClick={() => { setShowNotifs(false); setShowProfile(false); }} />
       )}
+      </div>
     </header>
   );
 }

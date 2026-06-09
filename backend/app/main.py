@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
-from app.routers import auth, listings, transactions, orders, suppliers, tracking, reviews, wallet, notifications, tankers
+from app.routers import auth, listings, transactions, orders, suppliers, tracking, reviews, wallet, notifications, tankers, customers, drivers, admin, complaints
 
 settings = get_settings()
 
@@ -38,6 +38,10 @@ app.include_router(reviews.router, prefix="/api")
 app.include_router(wallet.router, prefix="/api")
 app.include_router(notifications.router, prefix="/api")
 app.include_router(tankers.router, prefix="/api")
+app.include_router(customers.router, prefix="/api")
+app.include_router(drivers.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
+app.include_router(complaints.router, prefix="/api")
 
 @app.get("/")
 async def root():

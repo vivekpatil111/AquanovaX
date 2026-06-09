@@ -152,12 +152,13 @@ export function getMockTrackingEvents(orderId: string) {
 
 // ── MOCK DRIVER ROUTE (animated tracking) ────────────────────
 export const MOCK_ROUTE_POINTS = [
-  { lat: 19.070, lng: 72.870 },
-  { lat: 19.073, lng: 72.873 },
-  { lat: 19.076, lng: 72.876 },
-  { lat: 19.079, lng: 72.879 },
-  { lat: 19.082, lng: 72.882 },
-  { lat: 19.085, lng: 72.885 },
-  { lat: 19.088, lng: 72.888 },
-  { lat: 19.090, lng: 72.890 },
+  { lat: 19.070, lng: 72.870 }, // Start (Depot)
+  { lat: 19.075, lng: 72.870 }, // Drive North
+  { lat: 19.075, lng: 72.880 }, // Turn East
+  { lat: 19.080, lng: 72.885 }, // Curve North-East
+  { lat: 19.085, lng: 72.885 }, // Drive North
+  { lat: 19.090, lng: 72.890 }, // Curve North-East
+  { lat: 19.095, lng: 72.890 }, // Drive North
+  { lat: 19.098, lng: 72.895 }, // Turn East
+  { lat: 19.100, lng: 72.900 }, // End (Customer)
 ];

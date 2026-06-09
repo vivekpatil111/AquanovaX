@@ -85,55 +85,76 @@ body {
 /* ── COMPONENT CLASSES ───────────────────────────────────────── */
 
 .glass {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 .card {
-  background: #fff;
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-card);
-  border: 1px solid #E2E8F0;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-in-out;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px -1px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 1.25rem;
+  animation: fadeIn 0.4s ease-out;
 }
 
-@media (min-width: 768px) { .card { padding: 1.5rem; } }
+@media (min-width: 768px) { .card { padding: 1.75rem; } }
 
 .card-hover {
-  background: #fff;
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-card);
-  border: 1px solid #E2E8F0;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-in-out;
-  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px -1px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 1.25rem;
+  animation: fadeIn 0.4s ease-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {
-  box-shadow: var(--shadow-card-md);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -4px rgba(14, 165, 233, 0.15), inset 0 1px 1px rgba(255,255,255,1);
+  border-color: rgba(14, 165, 233, 0.3);
+  transform: translateY(-4px);
 }
 
-@media (min-width: 768px) { .card-hover { padding: 1.5rem; } }
+@media (min-width: 768px) { .card-hover { padding: 1.75rem; } }
 
 .kpi-card {
-  background: #fff;
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-card);
-  border: 1px solid #E2E8F0;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-in-out;
-  transition: all 0.2s;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px -4px rgba(0,0,0,0.06), inset 0 2px 2px rgba(255,255,255,1);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1.5rem;
+  animation: slideUp 0.5s ease-out backwards;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #38BDF8, #0284C7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .kpi-card:hover {
-  box-shadow: var(--shadow-card-md);
-  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -8px rgba(14, 165, 233, 0.2);
+  transform: translateY(-4px);
+}
+
+.kpi-card:hover::before {
+  opacity: 1;
 }
 
 /* Buttons */

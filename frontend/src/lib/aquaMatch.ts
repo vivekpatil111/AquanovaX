@@ -35,7 +35,7 @@ export function matchSuppliers(
     .map(s => {
       const dist = distanceKm(
         userLocation.lat, userLocation.lng,
-        s.address.lat ?? 19.07, s.address.lng ?? 72.87
+        s.address?.lat ?? s.location?.lat ?? 19.07, s.address?.lng ?? s.location?.lng ?? 72.87
       );
       if (dist > maxDistanceKm) return null;
 

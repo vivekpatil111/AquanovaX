@@ -28,19 +28,51 @@ export function OrdersPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      api.orders.getAll({ customerId: user.id }).then(data => setOrders(data || []));
-    }
+    if (!user) return;
+    
+    const fetchOrders = async () => {
+      let apiOrders: any[] = [];
+      try {
+        apiOrders = await api.orders.getAll({ customerId: user.id }) || [];
+      } catch (err) {
+        console.warn("Failed to fetch orders from backend", err);
+      }
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      
+      const apiOrderIds = new Set(apiOrders.map((o: any) => o.id));
+      const uniqueLocalOrders = localOrders.filter((o: any) => !apiOrderIds.has(o.id) && o.customer_id === user.id);
+      
+      const mockOrders = ORDERS.filter(o => o.customerId === user.id).map(o => ({
+        ...o,
+        suppliers: { name: o.supplierName },
+        created_at: o.createdAt
+      }));
+      const mockOrderIds = new Set([...apiOrderIds, ...uniqueLocalOrders.map((o:any) => o.id)]);
+      const uniqueMockOrders = mockOrders.filter(o => !mockOrderIds.has(o.id));
+
+      setOrders([...apiOrders, ...uniqueLocalOrders, ...uniqueMockOrders]);
+    };
+
+    fetchOrders();
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'local_orders') fetchOrders();
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [user]);
 
-  const tabs = ['active', 'completed', 'cancelled'] as const;
+  const tabs = ['pending', 'active', 'completed', 'cancelled'] as const;
   const tab = tabs[tabIndex];
 
-  const filtered = orders.filter(o => {
-    if (tab === 'active')    return ['pending','accepted','dispatched','in_transit'].includes(o.status);
-    if (tab === 'completed') return o.status === 'delivered';
+  const getFilteredOrders = (t: string) => orders.filter(o => {
+    if (t === 'pending')   return o.status === 'pending';
+    if (t === 'active')    return ['confirmed','dispatched','en_route'].includes(o.status);
+    if (t === 'completed') return o.status === 'delivered';
     return o.status === 'cancelled';
   });
+
+  const filtered = getFilteredOrders(tab);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }} className="animate-fade-in">
@@ -54,11 +86,7 @@ export function OrdersPage() {
       <Paper elevation={0} sx={{ border: '1px solid #E2E8F0', borderRadius: 2 }}>
         <Tabs value={tabIndex} onChange={(_, nv) => setTabIndex(nv)} indicatorColor="primary" textColor="primary" variant="scrollable" scrollButtons="auto">
           {tabs.map((t, idx) => {
-            const count = orders.filter(o => {
-              if (t === 'active') return ['pending','accepted','dispatched','in_transit'].includes(o.status);
-              if (t === 'completed') return o.status === 'delivered';
-              return o.status === 'cancelled';
-            }).length;
+            const count = getFilteredOrders(t).length;
             return <Tab key={t} label={`${t} (${count})`} sx={{ textTransform: 'capitalize', fontWeight: 'bold' }} />;
           })}
         </Tabs>
@@ -73,7 +101,7 @@ export function OrdersPage() {
         ) : filtered.map(order => (
           <Card key={order.id} sx={{ '&:hover': { boxShadow: 3, transform: 'translateY(-2px)' }, transition: 'all 0.2s', cursor: 'pointer' }}>
             <CardContent>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={2} sx={{ alignItems: 'center' }}>
                 <Grid size={{xs: 12, sm: 8}}    sx={{ display: 'flex', gap: 2 }}>
                   <MuiAvatar sx={{ bgcolor: 'primary.main', width: 48, height: 48, borderRadius: 2 }}>
                     <Droplets size={24} color="white" />

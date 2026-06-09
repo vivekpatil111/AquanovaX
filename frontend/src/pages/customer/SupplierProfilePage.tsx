@@ -56,7 +56,7 @@ export function SupplierProfilePage() {
   return (
     <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
       {/* Hero Card */}
-      <div className="card bg-gradient-to-br from-primary-600 to-primary-800 text-white overflow-hidden relative">
+      <div className="rounded-2xl shadow-md bg-gradient-to-br from-primary-600 to-primary-800 text-white overflow-hidden relative p-5 md:p-6 border border-primary-700">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white" />
           <div className="absolute -bottom-5 -left-5 w-28 h-28 rounded-full bg-white" />

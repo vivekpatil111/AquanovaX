@@ -197,58 +197,40 @@ interface HeatmapProps {
 }
 
 export function DemandHeatmap({ zones, height = '300px', className }: HeatmapProps) {
+  const blocks = [
+    1, 5, 4, 3, 2, 2, 2, 2,
+    1, 2, 5, 1, 3, 1, 1, 3,
+    2, 2, 1, 2, 1, 5, 4, 4,
+    3, 1, 4, 4, 2, 5, 5, 1,
+    5, 5, 2, 2, 3, 4, 1, 2
+  ];
+
+  const getColor = (v: number) => {
+    if (v === 1) return 'bg-slate-100';
+    if (v === 2) return 'bg-[#93C5FD]'; // blue-300
+    if (v === 3) return 'bg-[#60A5FA]'; // blue-400
+    if (v === 4) return 'bg-[#2563EB]'; // blue-600
+    return 'bg-[#EF4444]'; // red-500
+  };
+
   return (
-    <div className={cn('map-container', className)} style={{ height }}>
-      <svg viewBox="0 0 600 300" className="w-full h-full">
-        {/* Background */}
-        <rect x={0} y={0} width={600} height={300} fill="#EFF6FF" />
-
-        {/* Grid */}
-        {Array.from({ length: 6 }, (_, i) => (
-          <line key={`h${i}`} x1={0} y1={50 * i} x2={600} y2={50 * i} stroke="#BFDBFE" strokeWidth="1" />
-        ))}
-        {Array.from({ length: 10 }, (_, i) => (
-          <line key={`v${i}`} x1={60 * i} y1={0} x2={60 * i} y2={300} stroke="#BFDBFE" strokeWidth="1" />
-        ))}
-
-        {/* Heatmap circles */}
-        {zones.map((zone, i) => {
-          const x = 60 + (i % 4) * 130 + ((i > 3 ? i - 4 : 0) * 10);
-          const y = 80 + Math.floor(i / 4) * 100;
-          const r = 30 + zone.intensity * 40;
-          const opacity = 0.3 + zone.intensity * 0.5;
-          const color = zone.intensity > 0.75 ? '#EF4444'
-            : zone.intensity > 0.5 ? '#F59E0B'
-            : '#10B981';
-
-          return (
-            <g key={zone.zone}>
-              <circle cx={x} cy={y} r={r} fill={color} opacity={opacity} />
-              <circle cx={x} cy={y} r={r * 0.5} fill={color} opacity={opacity + 0.2} />
-              <text x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill="white" fontWeight="700">
-                {zone.orders}
-              </text>
-              <text x={x} y={y + r + 12} textAnchor="middle" fontSize="8" fill="#374151" fontWeight="600">
-                {zone.zone}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-
-      {/* Legend */}
-      <div className="absolute bottom-2 left-2 bg-white/90 rounded-lg p-2 text-xs space-y-1">
-        <div className="text-slate-500 font-semibold mb-1">Demand Level</div>
-        {[['High', '#EF4444'], ['Medium', '#F59E0B'], ['Low', '#10B981']].map(([label, color]) => (
-          <div key={label} className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-            <span className="text-slate-600">{label}</span>
-          </div>
+    <div className={cn("w-full h-full flex flex-col p-4 bg-white", className)}>
+      <div className="grid grid-cols-8 gap-2 flex-1 content-center">
+        {blocks.map((v, i) => (
+          <div key={i} className={cn("w-full h-10 rounded-md", getColor(v))} />
         ))}
       </div>
-
-      <div className="absolute bottom-2 right-2 text-xs text-slate-400 bg-white/70 px-1.5 py-0.5 rounded">
-        AquaMap™ Heatmap
+      
+      <div className="flex justify-between items-center mt-6 text-[10px] text-slate-500 font-medium">
+        <span>Low Demand</span>
+        <div className="flex gap-1.5">
+          <div className="w-5 h-2.5 bg-slate-100 rounded-sm" />
+          <div className="w-5 h-2.5 bg-[#93C5FD] rounded-sm" />
+          <div className="w-5 h-2.5 bg-[#60A5FA] rounded-sm" />
+          <div className="w-5 h-2.5 bg-[#2563EB] rounded-sm" />
+          <div className="w-5 h-2.5 bg-[#EF4444] rounded-sm" />
+        </div>
+        <span>High Demand</span>
       </div>
     </div>
   );

@@ -52,6 +52,12 @@ export const api = {
     getAll: () => fetchWithAuth('/suppliers/'),
     getOne: (id: string) => fetchWithAuth(`/suppliers/${id}`)
   },
+  drivers: {
+    getAll: () => fetchWithAuth('/drivers/'),
+  },
+  customers: {
+    getAll: () => fetchWithAuth('/customers/')
+  },
   orders: {
     getAll: (params?: { customerId?: string; supplierId?: string }) => {
       const qs = new URLSearchParams();
@@ -60,12 +66,47 @@ export const api = {
       const url = qs.toString() ? `/orders/?${qs.toString()}` : '/orders/';
       return fetchWithAuth(url);
     },
-    getOne: (id: string) => fetchWithAuth(`/orders/${id}`),
-    create: (data: any) => fetchWithAuth('/orders/', { method: 'POST', body: JSON.stringify(data) })
+    getOne: async (id: string) => {
+      if (id.startsWith('ord_local_')) {
+        const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+        const order = localOrders.find((o: any) => o.id === id);
+        if (order) return order;
+        throw new Error('Local order not found');
+      }
+      return fetchWithAuth(`/orders/${id}`);
+    },
+    create: (data: any) => fetchWithAuth('/orders/', { method: 'POST', body: JSON.stringify(data) }),
+    update: async (id: string, data: any) => {
+      if (id.startsWith('ord_local_')) {
+        const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+        const idx = localOrders.findIndex((o: any) => o.id === id);
+        if (idx > -1) {
+          localOrders[idx] = { ...localOrders[idx], ...data };
+          localStorage.setItem('local_orders', JSON.stringify(localOrders));
+          return localOrders[idx];
+        }
+        throw new Error('Local order not found');
+      }
+      return fetchWithAuth(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    }
   },
   tracking: {
-    getOne: (orderId: string) => fetchWithAuth(`/tracking/${orderId}`),
-    update: (orderId: string, data: any) => fetchWithAuth(`/tracking/${orderId}`, { method: 'PUT', body: JSON.stringify(data) })
+    getOne: async (orderId: string) => {
+      if (orderId.startsWith('ord_local_')) {
+        const localTrackings = JSON.parse(localStorage.getItem('local_trackings') || '{}');
+        return localTrackings[orderId] || null;
+      }
+      return fetchWithAuth(`/tracking/${orderId}`);
+    },
+    update: async (orderId: string, data: any) => {
+      if (orderId.startsWith('ord_local_')) {
+        const localTrackings = JSON.parse(localStorage.getItem('local_trackings') || '{}');
+        localTrackings[orderId] = { ...localTrackings[orderId], ...data };
+        localStorage.setItem('local_trackings', JSON.stringify(localTrackings));
+        return localTrackings[orderId];
+      }
+      return fetchWithAuth(`/tracking/${orderId}`, { method: 'PUT', body: JSON.stringify(data) });
+    }
   },
   tankers: {
     getAll: (supplierId: string) => fetchWithAuth(`/tankers/?supplier_id=${supplierId}`),
@@ -86,5 +127,14 @@ export const api = {
   transactions: {
     getMyTransactions: () => fetchWithAuth('/transactions/'),
     create: (data: any) => fetchWithAuth('/transactions/', { method: 'POST', body: JSON.stringify(data) }),
+  },
+  admin: {
+    getDashboard: () => fetchWithAuth('/admin/dashboard')
+  },
+  complaints: {
+    getAll: () => fetchWithAuth('/complaints/'),
+    getOne: (id: string) => fetchWithAuth(`/complaints/${id}`),
+    create: (data: any) => fetchWithAuth('/complaints/', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => fetchWithAuth(`/complaints/${id}`, { method: 'PUT', body: JSON.stringify(data) })
   }
 };

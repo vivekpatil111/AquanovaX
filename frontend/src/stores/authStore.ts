@@ -86,6 +86,15 @@ export const useAuthStore = create<AuthStore>()(
 
       login: async (email, password) => {
         set({ isLoading: true });
+        
+        // INTERCEPT DEMO USERS to avoid backend calls failing if they aren't registered yet
+        if (DEMO_USERS[email]) {
+          const loggedInUser = DEMO_USERS[email].user;
+          localStorage.setItem('aquanovax_token', 'demo_token_123');
+          set({ user: loggedInUser, isAuthenticated: true, isLoading: false });
+          return { success: true };
+        }
+
         try {
           const data = await api.auth.login({ email, password });
           if (data.access_token) {
@@ -147,6 +156,14 @@ export const useAuthStore = create<AuthStore>()(
               createdAt: new Date().toISOString(),
               isActive: true,
             };
+            
+            // For MVP demo, track newly registered drivers locally so they appear in Assign Driver
+            if (newUser.role === 'driver') {
+              const localDrivers = JSON.parse(localStorage.getItem('local_drivers') || '[]');
+              localDrivers.push(newUser);
+              localStorage.setItem('local_drivers', JSON.stringify(localDrivers));
+            }
+
             set({ user: newUser, isAuthenticated: true, isLoading: false });
             return { success: true };
           }

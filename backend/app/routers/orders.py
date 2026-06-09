@@ -32,6 +32,14 @@ async def get_order(order_id: UUID, supabase: Client = Depends(get_supabase)):
 async def create_order(order: dict, supabase: Client = Depends(get_supabase)):
     try:
         # Expects: customer_id, supplier_id, quantity, amount, delivery_date
+        customer_id = order.get("customer_id")
+        if customer_id:
+            # Check if customer exists in public.customers
+            cust_res = supabase.table("customers").select("id").eq("id", customer_id).execute()
+            if not cust_res.data:
+                # Insert minimal customer record
+                supabase.table("customers").insert({"id": customer_id}).execute()
+                
         response = supabase.table("orders").insert(order).execute()
         new_order = response.data[0]
         
@@ -43,5 +51,23 @@ async def create_order(order: dict, supabase: Client = Depends(get_supabase)):
         }).execute()
         
         return new_order
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.put("/{order_id}")
+async def update_order(order_id: UUID, order_update: dict, supabase: Client = Depends(get_supabase)):
+    try:
+        response = supabase.table("orders").update(order_update).eq("id", order_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+        
+        # If status is updated, we could add a tracking record, but for now just update the order
+        if "status" in order_update:
+            supabase.table("tracking").insert({
+                "order_id": str(order_id),
+                "current_status": order_update["status"]
+            }).execute()
+            
+        return response.data[0]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

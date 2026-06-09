@@ -98,7 +98,7 @@ export function getStatusConfig(status: OrderStatus) {
     delivered:  { label: 'Delivered',   bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' },
     cancelled:  { label: 'Cancelled',   bg: 'bg-red-100',     text: 'text-red-700',     dot: 'bg-red-400'     },
   };
-  return map[status];
+  return map[status] || { label: status || 'Unknown', bg: 'bg-slate-100', text: 'text-slate-600', dot: 'bg-slate-400' };
 }
 
 export function getQualityLabel(score: number): { label: string; color: string } {

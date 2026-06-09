@@ -109,7 +109,7 @@ export function MarketplacePage() {
           size="small"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          InputProps={{ startAdornment: <Search size={20} color="gray" style={{ marginRight: 8 }} /> }}
+          slotProps={{ input: { startAdornment: <Search size={20} color="gray" style={{ marginRight: 8 }} /> } }}
           sx={{ flex: 1, minWidth: 200, bgcolor: 'white' }}
         />
         <Select

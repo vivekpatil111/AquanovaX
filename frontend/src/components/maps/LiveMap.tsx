@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
 
 // Custom Icons
 const tankerIcon = new L.Icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png',
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/411/411712.png', // Delivery Truck
   iconSize: [40, 40],
   iconAnchor: [20, 20],
   popupAnchor: [0, -20],
@@ -82,8 +82,8 @@ export function LiveMap({ routePoints, startPoint, endPoint, height = '400px' }:
         scrollWheelZoom={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+          url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
         />
         
         {/* Customer Location */}

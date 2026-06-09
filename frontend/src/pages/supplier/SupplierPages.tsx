@@ -7,11 +7,13 @@ import { StatusBadge, TrustBadgeComp } from '@/components/common/Badge';
 import { Avatar } from '@/components/common/Avatar';
 import { getTankersBySupplier } from '@/data/tankers';
 import { DRIVERS } from '@/data/drivers';
+import { SUPPLIERS } from '@/data/suppliers';
 import { QUALITY_REPORTS } from '@/data/mockData';
 import { REVENUE_DATA } from '@/data/mockData';
 import { formatCurrency, formatDate, cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
+import { Water3DEffect } from '@/components/effects/Water3DEffect';
 import {
   Package, DollarSign, Truck, Star, Check, X,
   Plus, Edit2, FileText, AlertCircle, Loader2, Shield, Upload, CheckCircle2
@@ -28,10 +30,17 @@ export function SupplierDashboard() {
   useEffect(() => {
     if (!user) return;
     Promise.all([
-      api.orders.getAll({ supplierId: user.id }),
+      api.orders.getAll({ supplierId: user.id }).catch(() => []),
       api.suppliers.getOne(user.id).catch(() => ({ name: user.name, rating: 0, trust_score: 0, badge: 'bronze' }))
     ]).then(([ordersData, supData]) => {
-      setOrders(ordersData || []);
+      const apiOrders = ordersData || [];
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const myLocalOrders = localOrders.filter((o: any) => o.supplier_id === user.id);
+      
+      const apiOrderIds = new Set(apiOrders.map((o: any) => o.id));
+      const uniqueLocal = myLocalOrders.filter((o: any) => !apiOrderIds.has(o.id));
+      
+      setOrders([...apiOrders, ...uniqueLocal]);
       setSupplier(supData);
       setLoading(false);
     });
@@ -54,20 +63,23 @@ export function SupplierDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-dark">{supplier?.name || user?.name}</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <TrustBadgeComp badge={supplier?.badge || 'bronze'} />
-            <span className="text-muted text-sm">Trust Score: <strong className="text-dark">{supplier?.trust_score || 0}/100</strong></span>
-          </div>
+      {/* 3D Water Effect Header */}
+      <Water3DEffect 
+        title={supplier?.name || user?.name || "Supplier Dashboard"}
+        subtitle="Manage your fleet, track orders, and monitor your business growth."
+      />
+
+      <div className="flex items-center justify-between flex-wrap gap-3 mt-4">
+        <div className="flex items-center gap-2">
+          <TrustBadgeComp badge={supplier?.badge || 'bronze'} />
+          <span className="text-muted text-sm">Trust Score: <strong className="text-dark">{supplier?.trust_score || 0}/100</strong></span>
         </div>
         <button onClick={() => navigate('/supplier/kyc')} className="btn-secondary">
           <Shield className="w-4 h-4" /> Verify Business
         </button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard title="Total Orders"   value={orders.length}               icon={Package}     iconBg="bg-blue-50"    iconColor="text-blue-600"    change={18} changeLabel="this month" />
         <KPICard title="Revenue"        value={formatCurrency(revenue)}     icon={DollarSign}  iconBg="bg-emerald-50" iconColor="text-emerald-600" change={12} />
         <KPICard title="Active Tankers" value={`${activeTankers}/${myTankers.length}`} icon={Truck} iconBg="bg-amber-50" iconColor="text-amber-600" />
@@ -156,7 +168,12 @@ export function SupplierDashboard() {
                   <td>
                     {o.status === 'pending' && (
                       <div className="flex gap-1">
-                        <button className="btn-success btn-sm px-2"><Check className="w-3 h-3" /></button>
+                        <button className="btn-success btn-sm px-2" onClick={async () => {
+                          const local = JSON.parse(localStorage.getItem('local_orders') || '[]');
+                          const updatedLocal = local.map((lo: any) => lo.id === o.id ? { ...lo, status: 'confirmed' } : lo);
+                          localStorage.setItem('local_orders', JSON.stringify(updatedLocal));
+                          setOrders(orders.map(order => order.id === o.id ? { ...order, status: 'confirmed' } : order));
+                        }}><Check className="w-3 h-3" /></button>
                         <button className="btn-danger btn-sm px-2"><X className="w-3 h-3" /></button>
                       </div>
                     )}
@@ -181,13 +198,49 @@ export function SupplierOrdersPage() {
   const [orders, setOrders] = useState<Record<string, any>[]>([]);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState<string | null>(null);
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const [showDriverModal, setShowDriverModal] = useState<string | null>(null);
+
+  // Only show the driver we can actually log in as, plus any newly registered drivers
+  const availableDrivers = useMemo(() => {
+    const demoDriver = { id: 'usr_drv_001', name: 'Raju Patil (Demo Driver)', isAvailable: true, rating: 4.8, distance: '1.2 km away' };
+    
+    const localDrivers = JSON.parse(localStorage.getItem('local_drivers') || '[]');
+    const registeredDrivers = localDrivers.map((d: any) => ({
+      id: d.id,
+      name: d.name,
+      isAvailable: true,
+      rating: 5.0, // New drivers start with 5 stars
+      distance: 'Nearby'
+    }));
+
+    return [demoDriver, ...registeredDrivers];
+  }, []);
 
   useEffect(() => {
     if (!user) return;
-    api.orders.getAll({ supplierId: user.id }).then(data => {
-      setOrders(data || []);
-      setLoading(false);
-    });
+    
+    const fetchOrders = () => {
+      api.orders.getAll({ supplierId: user.id }).catch(() => []).then(data => {
+        const apiOrders = data || [];
+        const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+        const myLocalOrders = localOrders.filter((o: any) => o.supplier_id === user.id);
+        
+        const apiOrderIds = new Set(apiOrders.map((o: any) => o.id));
+        const uniqueLocal = myLocalOrders.filter((o: any) => !apiOrderIds.has(o.id));
+        
+        setOrders([...apiOrders, ...uniqueLocal]);
+        setLoading(false);
+      });
+    };
+
+    fetchOrders();
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'local_orders') fetchOrders();
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [user]);
 
   const filtered = useMemo(() => {
@@ -198,8 +251,47 @@ export function SupplierOrdersPage() {
 
   const handleAccept = async (id: string) => {
     setAccepting(id);
-    await new Promise(r => setTimeout(r, 800));
-    setAccepting(null);
+    try {
+      // First update the backend API if it's a real API order
+      try {
+        await api.orders.update(id, { status: 'confirmed' });
+      } catch (e) {
+        // Might be a local mock order, continue
+      }
+      
+      // Update local storage in case it's a local mock order
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const updatedLocal = localOrders.map((o: any) => o.id === id ? { ...o, status: 'confirmed' } : o);
+      localStorage.setItem('local_orders', JSON.stringify(updatedLocal));
+      
+      // Update UI state
+      setOrders(orders.map(o => o.id === id ? { ...o, status: 'confirmed' } : o));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAccepting(null);
+    }
+  };
+
+  const handleAssignDriver = async (orderId: string, driverId: string) => {
+    setAssigning(orderId);
+    setShowDriverModal(null);
+    try {
+      try {
+        await api.orders.update(orderId, { driver_id: driverId });
+      } catch (e) {
+        // Might be a local mock order, continue
+      }
+
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const updatedLocal = localOrders.map((o: any) => o.id === orderId ? { ...o, driver_id: driverId } : o);
+      localStorage.setItem('local_orders', JSON.stringify(updatedLocal));
+      
+      setOrders(orders.map(o => o.id === orderId ? { ...o, driver_id: driverId } : o));
+      alert('Driver assigned successfully! The driver will be notified.');
+    } finally {
+      setAssigning(null);
+    }
   };
 
   return (
@@ -241,7 +333,18 @@ export function SupplierOrdersPage() {
                     {accepting === o.id ? 'Accepting…' : <><Check className="w-4 h-4" /> Accept Order</>}
                   </button>
                   <button className="btn-danger btn-sm flex-1"><X className="w-4 h-4" /> Reject</button>
-                  <button className="btn-secondary btn-sm flex-1">Assign Driver</button>
+                </div>
+              )}
+              {tab === 'active' && o.status === 'confirmed' && !o.driver_id && (
+                <div className="flex gap-2 mt-4">
+                  <button onClick={() => setShowDriverModal(o.id)} className="btn-secondary btn-sm flex-1" disabled={assigning === o.id}>
+                    {assigning === o.id ? 'Assigning...' : 'Assign Driver'}
+                  </button>
+                </div>
+              )}
+              {tab === 'active' && o.driver_id && o.status === 'confirmed' && (
+                <div className="mt-4 text-sm font-medium text-amber-600 bg-amber-50 p-2 rounded-lg text-center">
+                  Driver Assigned — Awaiting Driver Acceptance
                 </div>
               )}
             </div>
@@ -252,6 +355,42 @@ export function SupplierOrdersPage() {
               <p className="text-muted font-medium">No {tab} orders at the moment</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Driver Selection Modal */}
+      {showDriverModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl animate-fade-in">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-dark">Select Driver</h3>
+              <button onClick={() => setShowDriverModal(null)} className="p-1 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-muted" /></button>
+            </div>
+            
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              {availableDrivers.map(d => (
+                <div key={d.id} className="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:border-slate-300 transition-colors">
+                  <div>
+                    <div className="font-semibold text-dark flex items-center gap-2">
+                      {d.name}
+                      {d.isAvailable && <span className="w-2 h-2 rounded-full bg-emerald-500"></span>}
+                    </div>
+                    <div className="flex items-center gap-3 mt-1 text-xs font-medium">
+                      <span className="text-amber-500 flex items-center gap-0.5"><Star className="w-3 h-3 fill-current" /> {d.rating}</span>
+                      <span className="text-muted">{d.distance}</span>
+                    </div>
+                  </div>
+                  {d.isAvailable ? (
+                    <button onClick={() => handleAssignDriver(showDriverModal, d.id)} className="btn-primary btn-sm px-4">
+                      Assign
+                    </button>
+                  ) : (
+                    <span className="badge-danger bg-slate-100 text-slate-500">Busy</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
