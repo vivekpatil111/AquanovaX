@@ -4,8 +4,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { KPICard } from '@/components/common/KPICard';
 import { StatusBadge } from '@/components/common/Badge';
 import { Avatar } from '@/components/common/Avatar';
-import { MockMap } from '@/components/maps/MockMap';
-import { StarRating, RatingDisplay } from '@/components/common/StarRating';
+import { LiveMap } from '@/components/maps/LiveMap';
+import { SuppliersMap } from '@/components/maps/SuppliersMap';
+import { RatingDisplay } from '@/components/common/StarRating';
 import { MOCK_ROUTE_POINTS } from '@/data/mockData';
 import { formatCurrency, formatDate, cn } from '@/lib/utils';
 import {
@@ -151,16 +152,18 @@ export function DriverDashboard() {
 
       {/* Assignment map */}
       <div className="card p-0 overflow-hidden">
-        <div className="p-4 border-b border-border"><h3 className="font-semibold text-dark">Today's Assignments</h3></div>
-        <MockMap
+        <div className="p-4 border-b border-border">
+          <h3 className="font-semibold text-dark">Today's Route Map</h3>
+          <p className="text-xs text-muted mt-0.5">Live delivery stops near you</p>
+        </div>
+        <SuppliersMap
           points={[
-            { id: 'me', lat: 19.070, lng: 72.870, type: 'driver', label: 'Me', isAnimated: true },
-            { id: 'd1', lat: 19.082, lng: 72.882, type: 'customer', label: 'Stop 1' },
-            { id: 'd2', lat: 19.090, lng: 72.890, type: 'customer', label: 'Stop 2' },
-            { id: 'd3', lat: 19.095, lng: 72.895, type: 'customer', label: 'Stop 3' },
+            { id: 'me',  lat: 19.070, lng: 72.870, label: 'My Location', type: 'driver' },
+            { id: 'd1',  lat: 19.082, lng: 72.882, label: 'Stop 1', type: 'customer' },
+            { id: 'd2',  lat: 19.090, lng: 72.890, label: 'Stop 2', type: 'customer' },
+            { id: 'd3',  lat: 19.095, lng: 72.895, label: 'Stop 3', type: 'customer' },
           ]}
-          routePoints={MOCK_ROUTE_POINTS}
-          height="240px"
+          height="280px"
         />
       </div>
 
@@ -280,19 +283,15 @@ export function RoutePage() {
       <h1 className="text-2xl font-bold text-dark">Today's Route</h1>
 
       <div className="card p-0 overflow-hidden">
-        <MockMap
-          points={[
-            { id: 'depot', lat: 19.065, lng: 72.865, type: 'depot', label: 'Depot' },
-            ...stops.map((o, i) => ({
-              id: `stop${i}`,
-              lat: 19.070 + i * 0.008,
-              lng: 72.870 + i * 0.008,
-              type: 'customer' as const,
-              label: `Stop ${i+1}`,
-            })),
-          ]}
+        <div className="p-4 border-b border-border">
+          <h3 className="font-semibold text-dark">Live Route Map</h3>
+          <p className="text-xs text-muted mt-0.5">Optimized delivery path</p>
+        </div>
+        <LiveMap
           routePoints={MOCK_ROUTE_POINTS}
-          height="300px"
+          startPoint={{ lat: 19.065, lng: 72.865 }}
+          endPoint={{ lat: 19.095, lng: 72.895 }}
+          height="320px"
         />
       </div>
 
