@@ -7,7 +7,7 @@ import { Avatar } from '@/components/common/Avatar';
 import { RatingDisplay } from '@/components/common/StarRating';
 import { DemandHeatmap, MockMap } from '@/components/maps/MockMap';
 import { matchSuppliers, suggestPrice } from '@/lib/aquaMatch';
-import { formatCurrency, formatDate, cn } from '@/lib/utils';
+import { formatCurrency, formatDate, cn, getGreeting } from '@/lib/utils';
 import {
   Users, Store, Truck, Package, DollarSign, TrendingUp,
   Search, Check, X, Eye, AlertCircle, ShieldCheck, BarChart3,
@@ -79,7 +79,7 @@ export function AdminDashboard() {
     <div className="space-y-6 animate-fade-in">
       {/* 3D Water Effect Header */}
       <Water3DEffect 
-        title="Admin Control Center"
+        title={`${getGreeting()} — Admin Control Center`}
         subtitle="Real-time platform metrics, revenue tracking, and global logistics intelligence."
       />
 

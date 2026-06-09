@@ -10,7 +10,7 @@ import { DRIVERS } from '@/data/drivers';
 import { SUPPLIERS } from '@/data/suppliers';
 import { QUALITY_REPORTS } from '@/data/mockData';
 import { REVENUE_DATA } from '@/data/mockData';
-import { formatCurrency, formatDate, cn } from '@/lib/utils';
+import { formatCurrency, formatDate, cn, getGreeting } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { Water3DEffect } from '@/components/effects/Water3DEffect';
@@ -65,7 +65,7 @@ export function SupplierDashboard() {
     <div className="space-y-6 animate-fade-in">
       {/* 3D Water Effect Header */}
       <Water3DEffect 
-        title={supplier?.name || user?.name || "Supplier Dashboard"}
+        title={`${getGreeting()}, ${supplier?.name?.split(' ')[0] || user?.name?.split(' ')[0] || 'Supplier'}! 👋`}
         subtitle="Manage your fleet, track orders, and monitor your business growth."
       />
 

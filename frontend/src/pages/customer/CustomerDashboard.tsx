@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { MockMap } from '@/components/maps/MockMap';
 import { SuppliersMap } from '@/components/maps/SuppliersMap';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate, getGreeting } from '@/lib/utils';
 import { TrustBadgeComp, StatusBadge } from '@/components/common/Badge';
 import { RatingDisplay } from '@/components/common/StarRating';
 import { Avatar } from '@/components/common/Avatar';
@@ -61,7 +61,7 @@ export function CustomerDashboard() {
     <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 4 }} className="animate-fade-in">
       {/* 3D Water Effect Header */}
       <Water3DEffect 
-        title={`Good morning, ${user?.name?.split(' ')[0] || 'User'}! 👋`}
+        title={`${getGreeting()}, ${user?.name?.split(' ')[0] || 'User'}! 👋`}
         subtitle="Here's your real-time water supply overview and logistics intelligence for today."
       />
 

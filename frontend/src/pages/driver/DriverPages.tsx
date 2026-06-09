@@ -8,7 +8,7 @@ import { LiveMap } from '@/components/maps/LiveMap';
 import { SuppliersMap } from '@/components/maps/SuppliersMap';
 import { RatingDisplay } from '@/components/common/StarRating';
 import { MOCK_ROUTE_POINTS } from '@/data/mockData';
-import { formatCurrency, formatDate, cn } from '@/lib/utils';
+import { formatCurrency, formatDate, cn, getGreeting } from '@/lib/utils';
 import {
   Package, Truck, CheckCircle2, Star, Navigation, MapPin,
   Clock, Phone, PlayCircle, CheckSquare, TrendingUp, Award, X
@@ -99,7 +99,7 @@ export function DriverDashboard() {
     <div className="space-y-6 animate-fade-in">
       {/* 3D Water Effect Header */}
       <Water3DEffect 
-        title={`Welcome, ${driver.name || 'Driver'}! 🚚`}
+        title={`${getGreeting()}, ${driver.name?.split(' ')[0] || 'Driver'}! 🚚`}
         subtitle="Your daily delivery route, active shipments, and earnings overview."
       />
 

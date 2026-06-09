@@ -8,6 +8,26 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Returns a time-aware greeting in India Standard Time (IST, UTC+5:30)
+ *  0–11  → Good Morning 🌅
+ * 12–16  → Good Afternoon ☀️
+ * 17–20  → Good Evening 🌆
+ * 21–23  → Good Night 🌙
+ */
+export function getGreeting(): string {
+  const now = new Date();
+  // Get current hour in IST (UTC+5:30)
+  const istOffset = 5.5 * 60; // minutes
+  const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const istHour = Math.floor((utcMinutes + istOffset) / 60) % 24;
+
+  if (istHour >= 5 && istHour < 12) return 'Good Morning 🌅';
+  if (istHour >= 12 && istHour < 17) return 'Good Afternoon ☀️';
+  if (istHour >= 17 && istHour < 21) return 'Good Evening 🌆';
+  return 'Good Night 🌙';
+}
+
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
