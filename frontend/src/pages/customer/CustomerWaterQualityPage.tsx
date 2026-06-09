@@ -35,7 +35,7 @@ export function CustomerWaterQualityPage() {
 
       <Grid container spacing={3}>
         {/* Left Column - Water Quality Report */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{xs: 12, md: 6}}>
           <Card sx={{ height: '100%', border: '1px solid #E5E7EB', boxShadow: 'none' }}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6" fontWeight="bold" sx={{ color: '#0A2540', mb: 0.5 }}>
@@ -53,7 +53,7 @@ export function CustomerWaterQualityPage() {
                   { value: report.hardness, unit: 'ppm', label: 'Hardness', status: getStatus(report.hardness, 300) },
                   { value: report.turbidity, unit: 'NTU', label: 'Turbidity', status: getStatus(report.turbidity, 1) },
                 ].map((metric, i) => (
-                  <Grid item xs={6} sm={3} key={i}>
+                  <Grid size={{xs: 6, sm: 3}} key={i}>
                     <Paper
                       elevation={0}
                       sx={{
@@ -89,7 +89,7 @@ export function CustomerWaterQualityPage() {
 
               {/* Source & Location */}
               <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={6}>
+                <Grid size={{xs: 6}}>
                   <Typography variant="caption" sx={{ color: '#6B7280', display: 'block' }}>
                     Source
                   </Typography>
@@ -97,7 +97,7 @@ export function CustomerWaterQualityPage() {
                     Deep Borewell
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={{xs: 6}}>
                   <Typography variant="caption" sx={{ color: '#6B7280', display: 'block' }}>
                     Location
                   </Typography>
@@ -140,7 +140,7 @@ export function CustomerWaterQualityPage() {
         </Grid>
 
         {/* Right Column - Quality History & Parameters */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{xs: 12, md: 6}}>
           <Card sx={{ height: '100%', border: '1px solid #E5E7EB', boxShadow: 'none' }}>
             <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', height: '100%' }}>
               

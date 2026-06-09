@@ -31,7 +31,7 @@ export function SuppliersMap({ points, height = '400px' }: SuppliersMapProps) {
   return (
     <div style={{ height, width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
       <MapContainer 
-        center={center as [number, number]} 
+        center={[center.lat, center.lng] as [number, number]} 
         zoom={11} 
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={false}

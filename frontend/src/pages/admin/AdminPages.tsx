@@ -957,19 +957,21 @@ export function AquaMatchDashboard() {
               <h3 className="font-bold text-dark mb-4 text-lg">Smart Supplier Match</h3>
               <p className="text-xs text-muted mb-4">Based on: {topArea}</p>
               <div className="space-y-3">
-                {topMatches.map((match, i) => (
-                  <div key={match.id} className={cn("p-3 border rounded-xl relative overflow-hidden", i === 0 ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50")}>
+                {topMatches.map((match: any, i: number) => {
+                  const supplier = match.supplier || match;
+                  return (
+                  <div key={supplier.id || i} className={cn("p-3 border rounded-xl relative overflow-hidden", i === 0 ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50")}>
                     {i === 0 && <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Best Match</div>}
                     <div className="flex justify-between items-start mb-2">
-                      <div className="font-bold text-dark">{match.businessName}</div>
-                      <div className="font-bold text-primary-600">₹{match.pricePerKL}</div>
+                      <div className="font-bold text-dark">{supplier.businessName || supplier.name}</div>
+                      <div className="font-bold text-primary-600">₹{supplier.pricePerKL || supplier.price}</div>
                     </div>
                     <div className="flex justify-between text-xs text-muted">
                       <span>5000L • ETA {15 + i * 10}m</span>
-                      <span className="flex items-center gap-1">⭐ {match.rating} • {1.5 + i * 1.5} km</span>
+                      <span className="flex items-center gap-1">⭐ {supplier.rating} • {match.distanceKm ? match.distanceKm.toFixed(1) : (1.5 + i * 1.5).toFixed(1)} km</span>
                     </div>
                   </div>
-                ))}
+                )})}
                 {topMatches.length === 0 && <div className="text-sm text-muted">No active suppliers found.</div>}
               </div>
             </div>
